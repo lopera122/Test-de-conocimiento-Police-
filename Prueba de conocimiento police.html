@@ -1,0 +1,997 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Evaluación | Police Old Stars RP</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Rajdhani:wght@400;600;700&family=Orbitron:wght@700;900&display=swap');
+
+    :root {
+      --blue-dark: #0a0e1a;
+      --blue-mid: #0d1b2e;
+      --blue-accent: #1a3a5c;
+      --gold: #f0c040;
+      --gold-light: #ffe480;
+      --cyan: #00cfff;
+      --white: #e8f0ff;
+      --gray: #7a8eaa;
+      --success: #00e676;
+      --danger: #ff4444;
+    }
+
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    body {
+      background-color: var(--blue-dark);
+      color: var(--white);
+      font-family: 'Rajdhani', sans-serif;
+      min-height: 100vh;
+      overflow-x: hidden;
+    }
+
+    body::before {
+      content: '';
+      position: fixed;
+      inset: 0;
+      background:
+        radial-gradient(ellipse at 20% 20%, rgba(0,120,255,.08) 0%, transparent 60%),
+        radial-gradient(ellipse at 80% 80%, rgba(0,207,255,.06) 0%, transparent 60%);
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    .scanlines {
+      position: fixed;
+      inset: 0;
+      background: repeating-linear-gradient(
+        to bottom,
+        transparent,
+        transparent 3px,
+        rgba(0,0,0,.07) 3px,
+        rgba(0,0,0,.07) 4px
+      );
+      pointer-events: none;
+      z-index: 1;
+    }
+
+    .container {
+      position: relative;
+      z-index: 2;
+      max-width: 860px;
+      margin: 0 auto;
+      padding: 30px 20px 60px;
+    }
+
+    header {
+      text-align: center;
+      margin-bottom: 40px;
+    }
+
+    .badge-top {
+      display: inline-flex;
+      align-items: center;
+      gap: 14px;
+      background: linear-gradient(135deg, #0d1b2e, #1a3a5c);
+      border: 2px solid var(--gold);
+      border-radius: 12px;
+      padding: 18px 36px;
+      box-shadow: 0 0 30px rgba(240,192,64,.25), inset 0 0 20px rgba(0,0,0,.4);
+    }
+
+    .badge-icon { font-size: 3rem; }
+
+    .badge-text h1 {
+      font-family: 'Orbitron', sans-serif;
+      font-size: 1.5rem;
+      color: var(--gold);
+      letter-spacing: 2px;
+      text-shadow: 0 0 12px rgba(240,192,64,.6);
+    }
+
+    .badge-text p {
+      font-size: 1rem;
+      color: var(--cyan);
+      letter-spacing: 3px;
+      text-transform: uppercase;
+    }
+
+    .subtitle {
+      margin-top: 14px;
+      color: var(--gray);
+      font-size: 1rem;
+      letter-spacing: 1px;
+    }
+
+    .progress-wrap {
+      background: rgba(255,255,255,.05);
+      border: 1px solid var(--blue-accent);
+      border-radius: 20px;
+      height: 10px;
+      margin-bottom: 30px;
+      overflow: hidden;
+    }
+
+    .progress-bar {
+      height: 100%;
+      width: 0%;
+      background: linear-gradient(90deg, var(--cyan), var(--gold));
+      border-radius: 20px;
+      transition: width .5s ease;
+      box-shadow: 0 0 10px rgba(0,207,255,.5);
+    }
+
+    .progress-label {
+      text-align: right;
+      font-size: .85rem;
+      color: var(--gray);
+      margin-bottom: 6px;
+    }
+
+    .question-card {
+      background: linear-gradient(145deg, #0d1b2e, #0a1525);
+      border: 1px solid var(--blue-accent);
+      border-radius: 14px;
+      padding: 28px 30px;
+      margin-bottom: 22px;
+      box-shadow: 0 4px 20px rgba(0,0,0,.4);
+      transition: border-color .3s;
+    }
+
+    .question-card:hover { border-color: var(--cyan); }
+
+    .question-number {
+      font-size: .78rem;
+      color: var(--cyan);
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      margin-bottom: 8px;
+    }
+
+    .question-text {
+      font-size: 1.15rem;
+      font-weight: 600;
+      color: var(--white);
+      margin-bottom: 18px;
+      line-height: 1.5;
+    }
+
+    .options { display: flex; flex-direction: column; gap: 10px; }
+
+    .option-label {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      background: rgba(255,255,255,.04);
+      border: 1px solid rgba(255,255,255,.1);
+      border-radius: 10px;
+      padding: 12px 16px;
+      cursor: pointer;
+      transition: all .25s;
+      font-size: 1rem;
+    }
+
+    .option-label:hover {
+      background: rgba(0,207,255,.08);
+      border-color: var(--cyan);
+    }
+
+    .option-label input[type="radio"] { display: none; }
+
+    .option-label.selected {
+      background: rgba(0,207,255,.12);
+      border-color: var(--cyan);
+      box-shadow: 0 0 10px rgba(0,207,255,.2);
+    }
+
+    .option-label.correct {
+      background: rgba(0,230,118,.12);
+      border-color: var(--success);
+    }
+
+    .option-label.wrong {
+      background: rgba(255,68,68,.1);
+      border-color: var(--danger);
+    }
+
+    .option-circle {
+      width: 28px; height: 28px;
+      border-radius: 50%;
+      border: 2px solid var(--gray);
+      display: flex; align-items: center; justify-content: center;
+      font-weight: 700;
+      font-size: .85rem;
+      flex-shrink: 0;
+      color: var(--gray);
+      transition: all .25s;
+    }
+
+    .option-label.selected .option-circle {
+      border-color: var(--cyan);
+      color: var(--cyan);
+      background: rgba(0,207,255,.15);
+    }
+
+    .option-label.correct .option-circle {
+      border-color: var(--success);
+      color: var(--success);
+      background: rgba(0,230,118,.15);
+    }
+
+    .option-label.wrong .option-circle {
+      border-color: var(--danger);
+      color: var(--danger);
+    }
+
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 14px 34px;
+      border: none;
+      border-radius: 10px;
+      font-family: 'Rajdhani', sans-serif;
+      font-size: 1.1rem;
+      font-weight: 700;
+      cursor: pointer;
+      letter-spacing: 1px;
+      transition: all .25s;
+      text-transform: uppercase;
+    }
+
+    .btn-primary {
+      background: linear-gradient(135deg, #0050a0, #0080d0);
+      color: #fff;
+      border: 1px solid var(--cyan);
+      box-shadow: 0 0 14px rgba(0,120,255,.3);
+    }
+
+    .btn-primary:hover {
+      background: linear-gradient(135deg, #0070c0, #00a0e0);
+      box-shadow: 0 0 22px rgba(0,207,255,.5);
+      transform: translateY(-2px);
+    }
+
+    .btn-gold {
+      background: linear-gradient(135deg, #b8860b, #f0c040);
+      color: #0a0e1a;
+      border: 1px solid var(--gold-light);
+      box-shadow: 0 0 14px rgba(240,192,64,.3);
+    }
+
+    .btn-gold:hover {
+      box-shadow: 0 0 24px rgba(240,192,64,.6);
+      transform: translateY(-2px);
+    }
+
+    .btn-wrap { text-align: center; margin-top: 30px; }
+
+    #result-section { display: none; }
+
+    .result-card {
+      background: linear-gradient(145deg, #0d1b2e, #0a1525);
+      border: 2px solid var(--gold);
+      border-radius: 18px;
+      padding: 40px 30px;
+      text-align: center;
+      box-shadow: 0 0 40px rgba(240,192,64,.2);
+    }
+
+    .rank-badge {
+      display: inline-block;
+      font-size: 5rem;
+      margin-bottom: 10px;
+      filter: drop-shadow(0 0 16px rgba(240,192,64,.5));
+      animation: pulse 2s infinite;
+    }
+
+    @keyframes pulse {
+      0%,100% { transform: scale(1); }
+      50% { transform: scale(1.06); }
+    }
+
+    .rank-title {
+      font-family: 'Orbitron', sans-serif;
+      font-size: 2rem;
+      color: var(--gold);
+      text-shadow: 0 0 18px rgba(240,192,64,.7);
+      letter-spacing: 3px;
+      margin-bottom: 6px;
+    }
+
+    .rank-sub {
+      font-size: 1rem;
+      color: var(--cyan);
+      letter-spacing: 2px;
+      margin-bottom: 24px;
+    }
+
+    .score-display {
+      display: inline-block;
+      background: rgba(0,207,255,.08);
+      border: 1px solid var(--cyan);
+      border-radius: 10px;
+      padding: 10px 28px;
+      font-size: 2rem;
+      font-weight: 700;
+      color: var(--cyan);
+      margin-bottom: 20px;
+      box-shadow: 0 0 14px rgba(0,207,255,.2);
+    }
+
+    .rank-description {
+      font-size: 1.05rem;
+      color: var(--gray);
+      max-width: 500px;
+      margin: 0 auto 28px;
+      line-height: 1.7;
+    }
+
+    .ranks-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 36px;
+    }
+
+    .ranks-table th {
+      background: rgba(0,207,255,.08);
+      border: 1px solid var(--blue-accent);
+      padding: 10px 16px;
+      font-size: .85rem;
+      letter-spacing: 1px;
+      color: var(--cyan);
+      text-transform: uppercase;
+    }
+
+    .ranks-table td {
+      border: 1px solid rgba(255,255,255,.06);
+      padding: 10px 16px;
+      font-size: .95rem;
+      color: var(--gray);
+    }
+
+    .ranks-table tr.active-rank td {
+      background: rgba(240,192,64,.07);
+      color: var(--gold);
+      font-weight: 700;
+    }
+
+    .name-section {
+      background: linear-gradient(145deg, #0d1b2e, #0a1525);
+      border: 1px solid var(--blue-accent);
+      border-radius: 14px;
+      padding: 28px 30px;
+      margin-bottom: 30px;
+    }
+
+    .name-section label {
+      display: block;
+      font-size: .85rem;
+      letter-spacing: 2px;
+      color: var(--cyan);
+      text-transform: uppercase;
+      margin-bottom: 10px;
+    }
+
+    .name-input {
+      width: 100%;
+      background: rgba(255,255,255,.05);
+      border: 1px solid var(--blue-accent);
+      border-radius: 8px;
+      padding: 12px 16px;
+      color: var(--white);
+      font-family: 'Rajdhani', sans-serif;
+      font-size: 1.1rem;
+      outline: none;
+      transition: border-color .25s;
+    }
+
+    .name-input:focus { border-color: var(--cyan); }
+
+    .section-title {
+      font-family: 'Orbitron', sans-serif;
+      font-size: .9rem;
+      color: var(--gold);
+      letter-spacing: 3px;
+      text-transform: uppercase;
+      margin: 36px 0 16px;
+      padding-bottom: 8px;
+      border-bottom: 1px solid rgba(240,192,64,.2);
+    }
+
+    .feedback-msg {
+      display: none;
+      margin-top: 12px;
+      padding: 10px 14px;
+      border-radius: 8px;
+      font-size: .95rem;
+    }
+
+    .feedback-msg.show { display: block; }
+    .feedback-msg.ok { background: rgba(0,230,118,.1); border-left: 3px solid var(--success); color: var(--success); }
+    .feedback-msg.fail { background: rgba(255,68,68,.08); border-left: 3px solid var(--danger); color: var(--danger); }
+
+    @media(max-width:600px) {
+      .badge-top { flex-direction: column; padding: 16px 20px; }
+      .badge-text h1 { font-size: 1.1rem; }
+      .rank-title { font-size: 1.5rem; }
+    }
+  </style>
+</head>
+<body>
+<div class="scanlines"></div>
+
+<div class="container">
+
+  <header>
+    <div class="badge-top">
+      <span class="badge-icon">🚔</span>
+      <div class="badge-text">
+        <h1>POLICE OLD STARS RP</h1>
+        <p>Evaluación de Rangos</p>
+      </div>
+    </div>
+    <p class="subtitle">Responde con honestidad — el rango que obtengas refleja tu nivel real</p>
+  </header>
+
+  <div id="quiz-section">
+
+    <div class="name-section">
+      <label>👮 Nombre del Oficial</label>
+      <input class="name-input" id="officer-name" type="text" placeholder="Ej: Juan Pérez #1024" maxlength="60"/>
+    </div>
+
+    <div class="progress-label" id="progress-label">Pregunta 0 de 15</div>
+    <div class="progress-wrap"><div class="progress-bar" id="progress-bar"></div></div>
+
+    <div class="section-title">📋 Protocolo & Procedimientos</div>
+
+    <div class="question-card" id="q1">
+      <div class="question-number">Pregunta 01</div>
+      <div class="question-text">¿Cuál es el primer paso al detener a un sospechoso durante una patrulla en roleplay?</div>
+      <div class="options">
+        <label class="option-label"><input type="radio" name="q1" value="a"/><span class="option-circle">A</span> Esposarlo de inmediato sin decir nada</label>
+        <label class="option-label"><input type="radio" name="q1" value="b"/><span class="option-circle">B</span> Identificarte como oficial, solicitar que se detenga y pedir documentos</label>
+        <label class="option-label"><input type="radio" name="q1" value="c"/><span class="option-circle">C</span> Llamar refuerzos antes de actuar</label>
+        <label class="option-label"><input type="radio" name="q1" value="d"/><span class="option-circle">D</span> Esperar a que el supervisor llegue</label>
+      </div>
+      <div class="feedback-msg" id="fb1"></div>
+    </div>
+
+    <div class="question-card" id="q2">
+      <div class="question-number">Pregunta 02</div>
+      <div class="question-text">¿Qué significa el código 10-4 en comunicación por radio?</div>
+      <div class="options">
+        <label class="option-label"><input type="radio" name="q2" value="a"/><span class="option-circle">A</span> Necesito refuerzos</label>
+        <label class="option-label"><input type="radio" name="q2" value="b"/><span class="option-circle">B</span> Mensaje recibido / Entendido</label>
+        <label class="option-label"><input type="radio" name="q2" value="c"/><span class="option-circle">C</span> En camino a la escena</label>
+        <label class="option-label"><input type="radio" name="q2" value="d"/><span class="option-circle">D</span> Sospechoso armado</label>
+      </div>
+      <div class="feedback-msg" id="fb2"></div>
+    </div>
+
+    <div class="question-card" id="q3">
+      <div class="question-number">Pregunta 03</div>
+      <div class="question-text">Un civil se niega a identificarse durante una parada de tráfico, ¿qué debe hacer el oficial?</div>
+      <div class="options">
+        <label class="option-label"><input type="radio" name="q3" value="a"/><span class="option-circle">A</span> Sacar el arma inmediatamente</label>
+        <label class="option-label"><input type="radio" name="q3" value="b"/><span class="option-circle">B</span> Dejarlo ir sin consecuencias</label>
+        <label class="option-label"><input type="radio" name="q3" value="c"/><span class="option-circle">C</span> Informar sobre la obligación legal, pedir que salga del vehículo y notificar por radio</label>
+        <label class="option-label"><input type="radio" name="q3" value="d"/><span class="option-circle">D</span> Ignorar la situación</label>
+      </div>
+      <div class="feedback-msg" id="fb3"></div>
+    </div>
+
+    <div class="question-card" id="q4">
+      <div class="question-number">Pregunta 04</div>
+      <div class="question-text">¿Cuándo está permitido usar la fuerza letal en el servidor RP?</div>
+      <div class="options">
+        <label class="option-label"><input type="radio" name="q4" value="a"/><span class="option-circle">A</span> Cuando el sospechoso corre</label>
+        <label class="option-label"><input type="radio" name="q4" value="b"/><span class="option-circle">B</span> Solo si el oficial tiene hambre de acción</label>
+        <label class="option-label"><input type="radio" name="q4" value="c"/><span class="option-circle">C</span> Cuando existe amenaza real e inminente a la vida y se agotaron otras opciones</label>
+        <label class="option-label"><input type="radio" name="q4" value="d"/><span class="option-circle">D</span> Siempre que lo ordene un superior</label>
+      </div>
+      <div class="feedback-msg" id="fb4"></div>
+    </div>
+
+    <div class="section-title">🎭 Rol & Actuación en Escena</div>
+
+    <div class="question-card" id="q5">
+      <div class="question-number">Pregunta 05</div>
+      <div class="question-text">¿Qué es el "Powergaming" en el roleplay policial?</div>
+      <div class="options">
+        <label class="option-label"><input type="radio" name="q5" value="a"/><span class="option-circle">A</span> Jugar con mucha energía</label>
+        <label class="option-label"><input type="radio" name="q5" value="b"/><span class="option-circle">B</span> Forzar acciones imposibles o irreales sobre otros jugadores sin darles oportunidad de respuesta</label>
+        <label class="option-label"><input type="radio" name="q5" value="c"/><span class="option-circle">C</span> Tener muchos recursos en el servidor</label>
+        <label class="option-label"><input type="radio" name="q5" value="d"/><span class="option-circle">D</span> Subir de rango rápidamente</label>
+      </div>
+      <div class="feedback-msg" id="fb5"></div>
+    </div>
+
+    <div class="question-card" id="q6">
+      <div class="question-number">Pregunta 06</div>
+      <div class="question-text">¿Qué significa "Metagaming" y por qué es una falta grave?</div>
+      <div class="options">
+        <label class="option-label"><input type="radio" name="q6" value="a"/><span class="option-circle">A</span> Jugar demasiado tiempo seguido</label>
+        <label class="option-label"><input type="radio" name="q6" value="b"/><span class="option-circle">B</span> Usar información OOC (fuera del personaje) para beneficiar al personaje dentro del roleplay</label>
+        <label class="option-label"><input type="radio" name="q6" value="c"/><span class="option-circle">C</span> Cambiar de personaje durante una escena</label>
+        <label class="option-label"><input type="radio" name="q6" value="d"/><span class="option-circle">D</span> Hablar por el micrófono fuera del personaje</label>
+      </div>
+      <div class="feedback-msg" id="fb6"></div>
+    </div>
+
+    <div class="question-card" id="q7">
+      <div class="question-number">Pregunta 07</div>
+      <div class="question-text">Durante una negociación de rehenes, ¿cuál es la actitud correcta del oficial?</div>
+      <div class="options">
+        <label class="option-label"><input type="radio" name="q7" value="a"/><span class="option-circle">A</span> Entrar a la fuerza inmediatamente</label>
+        <label class="option-label"><input type="radio" name="q7" value="b"/><span class="option-circle">B</span> Mantener calma, aislar la zona, comunicar con el negociador designado y esperar órdenes</label>
+        <label class="option-label"><input type="radio" name="q7" value="c"/><span class="option-circle">C</span> Retirarse del lugar</label>
+        <label class="option-label"><input type="radio" name="q7" value="d"/><span class="option-circle">D</span> Abrir fuego sin coordinación</label>
+      </div>
+      <div class="feedback-msg" id="fb7"></div>
+    </div>
+
+    <div class="question-card" id="q8">
+      <div class="question-number">Pregunta 08</div>
+      <div class="question-text">¿Qué es el "VDM" (Vehicle Death Match) y está permitido?</div>
+      <div class="options">
+        <label class="option-label"><input type="radio" name="q8" value="a"/><span class="option-circle">A</span> Una técnica de patrulla legítima</label>
+        <label class="option-label"><input type="radio" name="q8" value="b"/><span class="option-circle">B</span> Atropellar intencionalmente a jugadores sin razón de roleplay — está estrictamente prohibido</label>
+        <label class="option-label"><input type="radio" name="q8" value="c"/><span class="option-circle">C</span> Una persecución de vehículos autorizada</label>
+        <label class="option-label"><input type="radio" name="q8" value="d"/><span class="option-circle">D</span> Usar el vehículo para bloquear sospechosos</label>
+      </div>
+      <div class="feedback-msg" id="fb8"></div>
+    </div>
+
+    <div class="section-title">⭐ Cadena de Mando & Liderazgo</div>
+
+    <div class="question-card" id="q9">
+      <div class="question-number">Pregunta 09</div>
+      <div class="question-text">¿Cuál es el orden correcto de rangos de menor a mayor en Police Old Stars RP?</div>
+      <div class="options">
+        <label class="option-label"><input type="radio" name="q9" value="a"/><span class="option-circle">A</span> General → Teniente → Sargento → Oficial → Cadete</label>
+        <label class="option-label"><input type="radio" name="q9" value="b"/><span class="option-circle">B</span> Cadete → Oficial → Sargento → Teniente → General</label>
+        <label class="option-label"><input type="radio" name="q9" value="c"/><span class="option-circle">C</span> Oficial → Cadete → General → Sargento → Teniente</label>
+        <label class="option-label"><input type="radio" name="q9" value="d"/><span class="option-circle">D</span> Cadete → Sargento → Oficial → General → Teniente</label>
+      </div>
+      <div class="feedback-msg" id="fb9"></div>
+    </div>
+
+    <div class="question-card" id="q10">
+      <div class="question-number">Pregunta 10</div>
+      <div class="question-text">Un Cadete recibe una orden de un Oficial que considera incorrecta, ¿qué debe hacer?</div>
+      <div class="options">
+        <label class="option-label"><input type="radio" name="q10" value="a"/><span class="option-circle">A</span> Ignorar la orden completamente</label>
+        <label class="option-label"><input type="radio" name="q10" value="b"/><span class="option-circle">B</span> Obedecer y luego reportar su desacuerdo al superior siguiente por los canales correctos</label>
+        <label class="option-label"><input type="radio" name="q10" value="c"/><span class="option-circle">C</span> Discutir frente a todos en el chat</label>
+        <label class="option-label"><input type="radio" name="q10" value="d"/><span class="option-circle">D</span> Abandonar la escena</label>
+      </div>
+      <div class="feedback-msg" id="fb10"></div>
+    </div>
+
+    <div class="question-card" id="q11">
+      <div class="question-number">Pregunta 11</div>
+      <div class="question-text">¿Cuál es la responsabilidad principal de un Sargento dentro del servidor?</div>
+      <div class="options">
+        <label class="option-label"><input type="radio" name="q11" value="a"/><span class="option-circle">A</span> Solo patrullar calles</label>
+        <label class="option-label"><input type="radio" name="q11" value="b"/><span class="option-circle">B</span> Supervisar y guiar a Cadetes y Oficiales, mantener el orden y apoyar decisiones tácticas</label>
+        <label class="option-label"><input type="radio" name="q11" value="c"/><span class="option-circle">C</span> Hacer reportes administrativos únicamente</label>
+        <label class="option-label"><input type="radio" name="q11" value="d"/><span class="option-circle">D</span> Reemplazar al General cuando sea necesario</label>
+      </div>
+      <div class="feedback-msg" id="fb11"></div>
+    </div>
+
+    <div class="section-title">🔫 Situaciones Tácticas</div>
+
+    <div class="question-card" id="q12">
+      <div class="question-number">Pregunta 12</div>
+      <div class="question-text">Al llegar a una escena activa de tiroteo, ¿cuál es la primera acción correcta?</div>
+      <div class="options">
+        <label class="option-label"><input type="radio" name="q12" value="a"/><span class="option-circle">A</span> Correr hacia el centro del tiroteo</label>
+        <label class="option-label"><input type="radio" name="q12" value="b"/><span class="option-circle">B</span> Buscar cobertura, evaluar la situación, comunicar por radio y esperar coordinación</label>
+        <label class="option-label"><input type="radio" name="q12" value="c"/><span class="option-circle">C</span> Disparar a todo lo que se mueva</label>
+        <label class="option-label"><input type="radio" name="q12" value="d"/><span class="option-circle">D</span> Salir del servidor</label>
+      </div>
+      <div class="feedback-msg" id="fb12"></div>
+    </div>
+
+    <div class="question-card" id="q13">
+      <div class="question-number">Pregunta 13</div>
+      <div class="question-text">¿Qué es un "perímetro" y para qué sirve en una escena activa?</div>
+      <div class="options">
+        <label class="option-label"><input type="radio" name="q13" value="a"/><span class="option-circle">A</span> Un tipo de vehículo policial</label>
+        <label class="option-label"><input type="radio" name="q13" value="b"/><span class="option-circle">B</span> El área de descanso de los oficiales</label>
+        <label class="option-label"><input type="radio" name="q13" value="c"/><span class="option-circle">C</span> Una zona de contención alrededor de la escena para evitar que sospechosos escapen y proteger civiles</label>
+        <label class="option-label"><input type="radio" name="q13" value="d"/><span class="option-circle">D</span> El registro de arrestos del día</label>
+      </div>
+      <div class="feedback-msg" id="fb13"></div>
+    </div>
+
+    <div class="question-card" id="q14">
+      <div class="question-number">Pregunta 14</div>
+      <div class="question-text">Un compañero oficial actúa de forma corrupta dentro del RP, ¿qué haces?</div>
+      <div class="options">
+        <label class="option-label"><input type="radio" name="q14" value="a"/><span class="option-circle">A</span> Participar con él para no quedar mal</label>
+        <label class="option-label"><input type="radio" name="q14" value="b"/><span class="option-circle">B</span> Ignorarlo, no es tu problema</label>
+        <label class="option-label"><input type="radio" name="q14" value="c"/><span class="option-circle">C</span> Reportarlo al Sargento o superior correspondiente con evidencia, respetando los canales internos</label>
+        <label class="option-label"><input type="radio" name="q14" value="d"/><span class="option-circle">D</span> Publicarlo en el chat general inmediatamente</label>
+      </div>
+      <div class="feedback-msg" id="fb14"></div>
+    </div>
+
+    <div class="question-card" id="q15">
+      <div class="question-number">Pregunta 15</div>
+      <div class="question-text">¿Qué actitud define a un buen General dentro de Police Old Stars RP?</div>
+      <div class="options">
+        <label class="option-label"><input type="radio" name="q15" value="a"/><span class="option-circle">A</span> Abusar de su autoridad y actuar solo</label>
+        <label class="option-label"><input type="radio" name="q15" value="b"/><span class="option-circle">B</span> Liderar con el ejemplo, tomar decisiones justas, mantener la cohesión del equipo y representar el servidor con profesionalismo</label>
+        <label class="option-label"><input type="radio" name="q15" value="c"/><span class="option-circle">C</span> Solo dar órdenes sin participar en escenas</label>
+        <label class="option-label"><input type="radio" name="q15" value="d"/><span class="option-circle">D</span> Favorecer siempre a sus amigos</label>
+      </div>
+      <div class="feedback-msg" id="fb15"></div>
+    </div>
+
+    <div class="btn-wrap">
+      <button class="btn btn-gold" onclick="submitQuiz()">⭐ OBTENER MI RANGO</button>
+    </div>
+
+  </div><!-- /quiz-section -->
+
+  <div id="result-section">
+    <div class="result-card">
+      <div class="rank-badge" id="result-icon">🚔</div>
+      <div class="rank-title" id="result-rank">—</div>
+      <div class="rank-sub">POLICE OLD STARS RP</div>
+      <div class="score-display" id="result-score">0 / 15</div>
+      <div class="rank-description" id="result-desc">—</div>
+
+      <table class="ranks-table">
+        <thead>
+          <tr>
+            <th>Rango</th>
+            <th>Puntuación mínima</th>
+            <th>Descripción</th>
+          </tr>
+        </thead>
+        <tbody id="ranks-tbody"></tbody>
+      </table>
+
+      <div style="margin-top:30px; display:flex; gap:14px; justify-content:center; flex-wrap:wrap;">
+        <button class="btn btn-primary" onclick="restartQuiz()">🔄 Reiniciar Evaluación</button>
+      </div>
+    </div>
+  </div>
+
+</div><!-- /container -->
+
+<!-- EmailJS SDK -->
+<script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.min.js"></script>
+<script>
+  // ── INIT EMAILJS ──
+  (function(){
+    emailjs.init("7VCxOLA8BNgRUNFJJ");
+  })();
+
+  // ── RESPUESTAS CORRECTAS ──
+  const answers = {
+    q1:'b', q2:'b', q3:'c', q4:'c',
+    q5:'b', q6:'b', q7:'b', q8:'b',
+    q9:'b', q10:'b', q11:'b', q12:'b',
+    q13:'c', q14:'c', q15:'b'
+  };
+
+  // ── FEEDBACKS ──
+  const feedbacks = {
+    q1:  { ok:'✔ Correcto. Identificarse es el primer paso del protocolo.',         fail:'✘ Incorrecto. Siempre debes identificarte antes de cualquier acción.' },
+    q2:  { ok:'✔ Correcto. 10-4 = Mensaje recibido / Entendido.',                   fail:'✘ Incorrecto. 10-4 significa "Mensaje recibido".' },
+    q3:  { ok:'✔ Correcto. Informar, solicitar salir del vehículo y reportar.',      fail:'✘ Incorrecto. Hay un procedimiento antes de escalar la situación.' },
+    q4:  { ok:'✔ Correcto. Solo ante amenaza real e inminente.',                     fail:'✘ Incorrecto. La fuerza letal es el último recurso.' },
+    q5:  { ok:'✔ Correcto. Powergaming es forzar acciones irreales.',                fail:'✘ Incorrecto. Powergaming = forzar acciones imposibles sobre otros.' },
+    q6:  { ok:'✔ Correcto. Metagaming = usar info OOC dentro del RP.',              fail:'✘ Incorrecto. Metagaming es usar información fuera del personaje dentro del rol.' },
+    q7:  { ok:'✔ Correcto. Calma, aislamiento y comunicación son clave.',            fail:'✘ Incorrecto. En negociación de rehenes la coordinación es lo primero.' },
+    q8:  { ok:'✔ Correcto. VDM está estrictamente prohibido.',                       fail:'✘ Incorrecto. VDM es atropellar intencionalmente y está prohibido.' },
+    q9:  { ok:'✔ Correcto. Cadete → Oficial → Sargento → Teniente → General.',      fail:'✘ Incorrecto. El orden es: Cadete → Oficial → Sargento → Teniente → General.' },
+    q10: { ok:'✔ Correcto. Obedecer y luego reportar por canales adecuados.',        fail:'✘ Incorrecto. Se obedece primero y luego se escala el problema.' },
+    q11: { ok:'✔ Correcto. El Sargento supervisa y guía a los rangos inferiores.',   fail:'✘ Incorrecto. El Sargento tiene un rol de supervisión y mentoría.' },
+    q12: { ok:'✔ Correcto. Cobertura, evaluación y comunicación son lo primero.',    fail:'✘ Incorrecto. Nunca entres sin cobertura y sin comunicar.' },
+    q13: { ok:'✔ Correcto. El perímetro contiene la escena y protege civiles.',      fail:'✘ Incorrecto. Un perímetro es la zona de contención de la escena.' },
+    q14: { ok:'✔ Correcto. Reportar por los canales internos con evidencia.',        fail:'✘ Incorrecto. La corrupción debe reportarse al superior por los canales correctos.' },
+    q15: { ok:'✔ Correcto. Un General lidera con el ejemplo y profesionalismo.',     fail:'✘ Incorrecto. El General es el pilar del servidor y debe dar el mejor ejemplo.' }
+  };
+
+  // ── RANGOS ──
+  const ranks = [
+    { min:0,  max:4,  rank:'CADETE',    icon:'👮',  color:'#7a8eaa',
+      desc:'Eres nuevo en la unidad. Necesitas más entrenamiento antes de asumir responsabilidades mayores. Sigue aprendiendo el protocolo y las reglas del servidor.' },
+    { min:5,  max:7,  rank:'OFICIAL',   icon:'🚔',  color:'#4a90d9',
+      desc:'Tienes conocimientos básicos sólidos. Puedes patrullar con supervisión y participar en escenas estándar. Sigue practicando para ascender.' },
+    { min:8,  max:10, rank:'SARGENTO',  icon:'🏅',  color:'#00cfff',
+      desc:'Buen desempeño. Tienes capacidad para liderar pequeños equipos, guiar cadetes y tomar decisiones tácticas en campo.' },
+    { min:11, max:13, rank:'TENIENTE',  icon:'⭐',  color:'#f0c040',
+      desc:'Excelente conocimiento del protocolo y del roleplay. Puedes comandar unidades, coordinar operaciones y representar a la institución con honor.' },
+    { min:14, max:15, rank:'GENERAL',   icon:'🎖️', color:'#ffe480',
+      desc:'Conocimiento sobresaliente. Estás listo para liderar toda la unidad, tomar decisiones estratégicas y ser el máximo referente de Police Old Stars RP.' }
+  ];
+
+  // ── SELECCIÓN DE OPCIONES ──
+  document.querySelectorAll('.option-label').forEach(label => {
+    label.addEventListener('click', function () {
+      const name = this.querySelector('input').name;
+      document.querySelectorAll(`input[name="${name}"]`).forEach(inp => {
+        inp.closest('.option-label').classList.remove('selected');
+      });
+      this.classList.add('selected');
+      this.querySelector('input').checked = true;
+      updateProgress();
+    });
+  });
+
+  function updateProgress() {
+    const total = Object.keys(answers).length;
+    let answered = 0;
+    Object.keys(answers).forEach(q => {
+      if (document.querySelector(`input[name="${q}"]:checked`)) answered++;
+    });
+    const pct = (answered / total) * 100;
+    document.getElementById('progress-bar').style.width = pct + '%';
+    document.getElementById('progress-label').textContent = `Pregunta ${answered} de ${total}`;
+  }
+
+  // ── SUBMIT ──
+  function submitQuiz() {
+    const name = document.getElementById('officer-name').value.trim() || 'Oficial Anónimo';
+
+    const unanswered = Object.keys(answers).filter(q => !document.querySelector(`input[name="${q}"]:checked`));
+    if (unanswered.length > 0) {
+      alert(`⚠️ Faltan ${unanswered.length} pregunta(s) sin responder. Por favor completa toda la evaluación.`);
+      document.getElementById(unanswered[0]).scrollIntoView({ behavior:'smooth', block:'center' });
+      return;
+    }
+
+    let score = 0;
+    Object.keys(answers).forEach((q, i) => {
+      const num = i + 1;
+      const selected = document.querySelector(`input[name="${q}"]:checked`).value;
+      const correct = answers[q];
+      const fb = document.getElementById(`fb${num}`);
+
+      document.querySelectorAll(`input[name="${q}"]`).forEach(inp => {
+        const lbl = inp.closest('.option-label');
+        lbl.style.pointerEvents = 'none';
+        if (inp.value === correct) lbl.classList.add('correct');
+        if (inp.checked && inp.value !== correct) lbl.classList.add('wrong');
+      });
+
+      if (selected === correct) {
+        score++;
+        fb.textContent = feedbacks[q].ok;
+        fb.className = 'feedback-msg ok show';
+      } else {
+        fb.textContent = feedbacks[q].fail;
+        fb.className = 'feedback-msg fail show';
+      }
+    });
+
+    const rankData = ranks.find(r => score >= r.min && score <= r.max);
+
+    document.getElementById('quiz-section').style.display = 'none';
+    const rs = document.getElementById('result-section');
+    rs.style.display = 'block';
+    rs.scrollIntoView({ behavior:'smooth' });
+
+    document.getElementById('result-icon').textContent = rankData.icon;
+    document.getElementById('result-rank').textContent = rankData.rank;
+    document.getElementById('result-rank').style.color = rankData.color;
+    document.getElementById('result-rank').style.textShadow = `0 0 18px ${rankData.color}`;
+    document.getElementById('result-score').textContent = `${score} / 15`;
+    document.getElementById('result-desc').innerHTML = `<strong style="color:#fff">${name}</strong><br><br>${rankData.desc}`;
+
+    const tbody = document.getElementById('ranks-tbody');
+    tbody.innerHTML = '';
+    ranks.forEach(r => {
+      const tr = document.createElement('tr');
+      if (r.rank === rankData.rank) tr.classList.add('active-rank');
+      tr.innerHTML = `<td>${r.icon} ${r.rank}</td><td>${r.min}–${r.max} pts</td><td>${r.desc.split('.')[0]}.</td>`;
+      tbody.appendChild(tr);
+    });
+
+    window._lastResult = {
+      name, score,
+      rank: rankData.rank,
+      rankIcon: rankData.icon,
+      rankColor: rankData.color,
+      descShort: rankData.desc.split('.')[0] + '.'
+    };
+
+    // ── ENVIAR CORREO AUTOMÁTICAMENTE AL TERMINAR ──
+    sendResultEmail(name, score, rankData.rank, rankData.icon, rankData.color);
+  }
+
+  // ── FUNCIÓN ENVIAR CORREO (fetch directo a API REST de EmailJS) ──
+  function sendResultEmail(name, score, rank, icon, rankColor) {
+    console.log('📤 Enviando correo a EmailJS...');
+
+    fetch('https://api.emailjs.com/api/v1.0/email/send', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        service_id:  'service_0eoyuq3',
+        template_id: 'template_u1f5w39',
+        user_id:     '7VCxOLA8BNgRUNFJJ',
+        template_params: {
+          name:  name,
+          score: String(score),
+          rank:  icon + ' ' + rank,
+          image: ''
+        }
+      })
+    })
+    .then(function(res) {
+      if (res.ok) {
+        console.log('✅ Correo enviado correctamente');
+      } else {
+        return res.text().then(function(t) {
+          console.error('❌ EmailJS respondió con error:', res.status, t);
+        });
+      }
+    })
+    .catch(function(err) {
+      console.error('❌ Error de red al enviar correo:', err.message);
+    });
+  }
+
+  // ── REINICIAR ──
+  function restartQuiz() {
+    document.querySelectorAll('input[type="radio"]').forEach(i => i.checked = false);
+    document.querySelectorAll('.option-label').forEach(l => {
+      l.classList.remove('selected','correct','wrong');
+      l.style.pointerEvents = '';
+    });
+    document.querySelectorAll('.feedback-msg').forEach(f => f.className = 'feedback-msg');
+    document.getElementById('progress-bar').style.width = '0%';
+    document.getElementById('progress-label').textContent = 'Pregunta 0 de 15';
+    document.getElementById('result-section').style.display = 'none';
+    document.getElementById('quiz-section').style.display = 'block';
+    window.scrollTo({ top:0, behavior:'smooth' });
+  }
+
+
+  // ── REINICIAR ──
+  function restartQuiz() {
+    document.querySelectorAll('input[type="radio"]').forEach(i => i.checked = false);
+    document.querySelectorAll('.option-label').forEach(l => {
+      l.classList.remove('selected','correct','wrong');
+      l.style.pointerEvents = '';
+    });
+    document.querySelectorAll('.feedback-msg').forEach(f => f.className = 'feedback-msg');
+    document.getElementById('progress-bar').style.width = '0%';
+    document.getElementById('progress-label').textContent = 'Pregunta 0 de 15';
+    document.getElementById('result-section').style.display = 'none';
+    document.getElementById('quiz-section').style.display = 'block';
+    window.scrollTo({ top:0, behavior:'smooth' });
+  }
+
+  // ── CAPTURAR Y DESCARGAR IMAGEN ──
+  function captureResult() {
+    const msg = document.getElementById('screenshot-msg');
+    const btn = document.getElementById('btn-capture');
+    msg.style.display = 'block';
+    msg.style.color = 'var(--cyan)';
+    msg.textContent = '📸 Generando imagen...';
+    btn.disabled = true;
+
+    const r = window._lastResult || {};
+    const filename = 'PoliciaOldStars_' + (r.rank || 'resultado').replace(/ /g, '_') + '.png';
+
+    const canvas = document.createElement('canvas');
+    canvas.width = 800;
+    canvas.height = 500;
+    const ctx = canvas.getContext('2d');
+
+    // Fondo
+    const bg = ctx.createLinearGradient(0, 0, 800, 500);
+    bg.addColorStop(0, '#0d1b2e');
+    bg.addColorStop(1, '#0a1525');
+    ctx.fillStyle = bg;
+    ctx.fillRect(0, 0, 800, 500);
+
+    // Borde dorado
+    ctx.strokeStyle = '#f0c040';
+    ctx.lineWidth = 3;
+    ctx.beginPath();
+    ctx.roundRect(10, 10, 780, 480, 16);
+    ctx.stroke();
+
+    // Header
+    const hdr = ctx.createLinearGradient(0, 0, 800, 0);
+    hdr.addColorStop(0, '#0d1b2e');
+    hdr.addColorStop(1, '#1a3a5c');
+    ctx.fillStyle = hdr;
+    ctx.fillRect(10, 10, 780, 80);
+
+    // Título servidor
+    ctx.fillStyle = '#f0c040';
+    ctx.font = 'bold 22px Arial';
+    ctx.textAlign = 'center';
+    ctx.shadowColor = 'rgba(240,192,64,0.7)';
+    ctx.shadowBlur = 10;
+    ctx.fillText('🚔  POLICE OLD STARS RP', 400, 45);
+    ctx.shadowBlur = 0;
+
+    ctx.fillStyle = '#00cfff';
+    ctx.font = '13px Arial';
+    ctx.fillText('EVALUACIÓN DE RANGO OFICIAL', 400, 70);
+
+    // Ícono rango
+    ctx.font = '80px Arial';
+    ctx.fillText(r.rankIcon || '🏅', 400, 205);
+
+    // Nombre del rango
+    const rankColor = r.rankColor || '#f0c040';
+    ctx.fillStyle = rankColor;
+    ctx.font = 'bold 44px Arial';
+    ctx.shadowColor = rankColor;
+    ctx.shadowBlur = 16;
+    ctx.fillText(r.rank || '—', 400, 265);
+    ctx.shadowBlur = 0;
+
+    // Caja puntaje
+    ctx.fillStyle = 'rgba(0,207,255,0.1)';
+    ctx.strokeStyle = '#00cfff';
+    ctx.lineWidth = 1.5;
+    ctx.beginPath();
+    ctx.roundRect(290, 278, 220, 48, 8);
+    ctx.fill();
+    ctx.stroke();
+
+    ctx.fillStyle = '#00cfff';
+    ctx.font = 'bold 26px Arial';
+    ctx.fillText((r.score !== undefined ? r.score : '0') + ' / 15 pts', 400, 310);
+
+    // Nombre oficial
+    ctx.fillStyle = '#e8f0ff';
+    ctx.font = 'bold 18px Arial';
+    ctx.fillText('👮  ' + (r.name || 'Oficial'), 400, 360);
+
+    // Descripción corta
+    ctx.fillStyle = '#7a8eaa';
+    ctx.font = '14px Arial';
+    // Truncar si es muy largo
+    let desc = r.descShort || '';
+    if (desc.length > 80) desc = desc.substring(0, 77) + '...';
+    ctx.fillText(desc, 400, 392);
+
+    // Footer
+    ctx.fillStyle = 'rgba(255,255,255,0.06)';
+    ctx.fillRect(10, 455, 780, 35);
+    ctx.fillStyle = '#7a8eaa';
+    ctx.font = '12px Arial';
+    ctx.fillText('Police Old Stars RP  •  Evaluación de Conocimiento Policial', 400, 477);
+
+    // ── DESCARGAR IMAGEN ──
+    try {
+      canvas.toBlob(function(blob) {
+        const url = URL.createObjectURL(blob);
+        const link = document.createElement('a');
+        link.download = filename;
+        link.href = url;
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+        setTimeout(() => URL.revokeObjectURL(url), 1000);
+
+        msg.textContent = '✔ Foto descargada — ¡compártela en el servidor!';
+        msg.style.color = 'var(--success)';
+        btn.disabled = false;
+        setTimeout(() => { msg.style.display = 'none'; }, 5000);
+      }, 'image/png');
+    } catch(e) {
+      msg.textContent = '⚠️ Error al descargar: ' + e.message;
+      msg.style.color = 'var(--danger)';
+      btn.disabled = false;
+    }
+  }
+</script>
+</body>
+</html>
